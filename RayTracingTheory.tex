@@ -582,10 +582,48 @@
                 \begin{equation}
                     c_d=c_l\frac{\overrightarrow{r}\cdot\overrightarrow{n_hit}}{\left|\overrightarrow{r}\right|^3}.
                 \end{equation}
-                其中$c_l$是点光源发光强度,$\overrightarrow{r}$是从面源到点光源的位矢.
-                \indent 还要随机发出一根漫反射光线来计算其光照.以交点$\overrightarrow{p_0}$为原点建立极坐标,
-                其z轴正方向就是$\overrightarrow{n_hit}$,而x轴可以用$\overrightarrow{n_hit}$叉乘任意矢量
-                (不与$\overrightarrow{n_hit}$共线)得到.之后利用随机数
+                其中$c_l$是点光源发光强度,$\overrightarrow{r}$是从面源到点光源的位矢.\\
+                \indent 还要随机发出一根漫反射光线来计算其总的光照.以交点$\overrightarrow{p_0}$为原
+                点建立极坐标,其z轴正方向就是$\overrightarrow{n_{hit}}$,而x轴可以
+                用$\overrightarrow{n_hit}$叉乘任意矢量(不与$\overrightarrow{n_hit}$共线)得到.之后利
+                用随机数$\{x,y\}$来生成$(\theta,\phi)$:由于在某个方向$(\theta,\phi)$对应的$d\Omega$内
+                发出一根光线的概率为:
+                \begin{equation}
+                    d p=\frac{d\Omega}{2\pi}=\frac{\sin{\theta}d\theta d\phi}{2\pi},
+                \end{equation}
+                故若想要在可见半球面内按照立体角均匀采样,要使得:
+                \begin{equation}
+                    d p(x,y)=dx dy=\frac{\sin{\theta}d\theta d\phi}{2\pi},
+                \end{equation}
+                令$\phi=2\pi y$,则可得:
+                \begin{equation}
+                    \theta=\arccos{x}.
+                \end{equation}
+                但是一般并不这么采样.考虑到在计算漫反射强度的时候还要乘以$\cos{\theta}$,
+                根据蒙特卡洛积分理论可知:
+                \begin{equation}
+                    I = \int_{\Omega}{c(\theta,\phi)\cos{\theta}d\Omega}
+                    = \int_{\Omega}{c(\theta,\phi)\cos{\theta}\sin{\theta}d\theta d\phi}
+                    =\frac{1}{N}\sum_{i=1}^{N}{c(\theta_i,\phi_i)\cos{\theta_i}}.
+                \end{equation}
+                其中最后的$\theta_i(x)$,$\phi_1(y)$是上面计算的平均随机分布变量的函数,而
+                $c(\theta,\phi)$则是在$(\theta,\phi)$方向上的光照强度.若我们把$\cos{theta}$
+                也考虑到采样中,即$\theta$越大,对该点的漫反射贡献越小,则可以按照如下方式计算:
+                \begin{equation}
+                    d p = A \cos{\theta}\frac{d\Omega}{2\pi}
+                    =\frac{1}{\pi}\cos{\theta}\sin{\theta}d\theta d\phi.
+                \end{equation}
+                其中$A$是归一化系数.得到:
+                \begin{equation}
+                    d p(x,y)=dx dy=\frac{1}{\pi}\cos{\theta}\sin{\theta}d\theta d\phi,
+                \end{equation}
+                令$\phi=2\pi y$,同理可得:
+                \begin{equation}
+                    \theta=\arcsin{\sqrt{x}}.
+                \end{equation}
+                这样得到的分布就不需要在乘$\cos{\theta}$来计算漫反射,因为这个因子已经体现在
+                了采样概率里面:$\theta$越大的地方采样数量越多.而且实际上这样做还有利于减少采
+                样的方差.
             \subsubsection{自发光}
                 这个属于物体固有属性,直接读取就行.一般发光体的自发光强与角度无关.
             \subsubsection{衰减}
